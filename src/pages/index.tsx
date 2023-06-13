@@ -6,6 +6,7 @@ import { SignInButton, useUser } from "@clerk/nextjs";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import Image from "next/image";
+import { LoadingPage, LoadingSpinner } from "~/components/loading";
 
 dayjs.extend(relativeTime);
 
@@ -42,7 +43,7 @@ const PostView = (props: PostWithUser) => {
         height={56}
         width={56}
       />
-      <div className="flex flex-col bg-white text-slate-300">
+      <div className="eacttext-slate-300 flex flex-col">
         <span>{post.content}</span>
         <div>
           <span>{`By: ${author.username}`}</span>
@@ -57,7 +58,7 @@ const Home: NextPage = () => {
   const user = useUser();
   const { data, isLoading } = api.posts.getAll.useQuery();
   console.log(user);
-  if (isLoading) return <div>...Loading</div>;
+  if (isLoading) return <LoadingPage />;
   if (!data) return <div>Something went wrong</div>;
 
   return (
