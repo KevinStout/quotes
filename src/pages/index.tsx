@@ -42,7 +42,7 @@ const PostView = (props: PostWithUser) => {
         height={56}
         width={56}
       />
-      <div className="flex flex-col text-slate-300">
+      <div className="flex flex-col bg-white text-slate-300">
         <span>{post.content}</span>
         <div>
           <span>{`By: ${author.username}`}</span>
