@@ -1,16 +1,27 @@
 import { type NextPage } from "next";
 import Head from "next/head";
-import Link from "next/link";
 import { RouterOutputs, api } from "~/utils/api";
 import { SignInButton, useUser } from "@clerk/nextjs";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import Image from "next/image";
+import { LoadingPage } from "~/components/loading";
+import { useState } from "react";
 
 dayjs.extend(relativeTime);
 
 const CreatePostWizard = () => {
   const { user } = useUser();
+  const [input, setInput] = useState("");
+  const ctx = api.useContext();
+  const { mutate, isLoading: isPosting } = api.posts.create.useMutation({
+    onSuccess: () => {
+      setInput("");
+      // added void to tell type script to ignor the promise
+      void ctx.posts.getAll.invalidate();
+    },
+  });
+
   if (!user) return null;
   return (
     <div className="flex w-full gap-3">
@@ -25,7 +36,11 @@ const CreatePostWizard = () => {
         type="text"
         placeholder="Type a quote"
         className="grow bg-transparent outline-none"
+        value={input}
+        onChange={(e) => setInput(e.target.value)}
+        disabled={isPosting}
       />
+      <button onClick={() => mutate({ content: input })}>Post</button>
     </div>
   );
 };
@@ -42,23 +57,41 @@ const PostView = (props: PostWithUser) => {
         height={56}
         width={56}
       />
-      <div className="flex flex-col bg-white text-slate-300">
-        <span>{post.content}</span>
+      <div className="eacttext-slate-300 flex flex-col">
         <div>
           <span>{`By: ${author.username}`}</span>
-          <span>{` · ${dayjs(post.createdAt).fromNow()}`}</span>
+          <span className="font-thin">{` · ${dayjs(
+            post.createdAt
+          ).fromNow()}`}</span>
         </div>
+        <span className="text-xl">{post.content}</span>
       </div>
     </div>
   );
 };
 
-const Home: NextPage = () => {
-  const user = useUser();
-  const { data, isLoading } = api.posts.getAll.useQuery();
-  console.log(user);
-  if (isLoading) return <div>...Loading</div>;
+const Feed = () => {
+  const { data, isLoading: postsLoading } = api.posts.getAll.useQuery();
+
+  if (postsLoading) return <LoadingPage />;
+
   if (!data) return <div>Something went wrong</div>;
+
+  return (
+    <div className="flex flex-col">
+      {...data?.map((fullpost) => (
+        <PostView {...fullpost} key={fullpost.post.id} />
+      ))}
+    </div>
+  );
+};
+
+const Home: NextPage = () => {
+  const { isLoaded: userLoaded, isSignedIn } = useUser();
+  // start fetching data early
+  api.posts.getAll.useQuery();
+  // Return empty div if user isn't loaded
+  if (!userLoaded) return <div />;
 
   return (
     <>
@@ -68,20 +101,16 @@ const Home: NextPage = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main className="flex h-screen justify-center">
-        <div className="h-full w-full border-x border-slate-400 md:max-w-2xl">
+        <div className="h-full w-full border-x border-slate-400 md:max-w-3xl">
           <div className="flex border-b border-slate-400 p-4">
-            {!user.isSignedIn && (
+            {!isSignedIn && (
               <div className="flex justify-center">
                 <SignInButton />
               </div>
             )}
-            {user.isSignedIn && <CreatePostWizard />}
+            {isSignedIn && <CreatePostWizard />}
           </div>
-          <div className="flex flex-col">
-            {...data?.map((fullpost) => (
-              <PostView {...fullpost} key={fullpost.post.id} />
-            ))}
-          </div>
+          <Feed />
         </div>
       </main>
     </>
