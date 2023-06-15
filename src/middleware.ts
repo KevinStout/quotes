@@ -1,4 +1,4 @@
-// This file contains the middle ware for clerk both the old way and new way 
+// This file contains the middle ware for clerk both the old way and new way
 import { authMiddleware } from "@clerk/nextjs";
 
 export default authMiddleware();
@@ -12,7 +12,6 @@ export const config = {
 // import type { NextRequest } from "next/server";
 
 // export default withClerkMiddleware((req: NextRequest) => {
-//   console.log("MIDDLEWARE CALLED");
 //   return NextResponse.next();
 // });
 
