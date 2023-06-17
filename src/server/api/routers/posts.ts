@@ -1,5 +1,4 @@
 import { clerkClient } from "@clerk/nextjs";
-import type { User } from "@clerk/nextjs/dist/types/server";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import {
@@ -7,15 +6,7 @@ import {
   privateProcedure,
   publicProcedure,
 } from "~/server/api/trpc";
-
-const filterUserForClient = (user: User) => {
-  return {
-    id: user.id,
-    username: user.username,
-    profilePicture: user.profileImageUrl,
-  };
-};
-
+import { filterUserForClient } from "~/server/helpers/FilterUserForClient";
 import { Ratelimit } from "@upstash/ratelimit";
 import { Redis } from "@upstash/redis";
 // Create a new ratelimiter, that allows 3 requests per 1 minute
@@ -69,8 +60,8 @@ export const postsRouter = createTRPCRouter({
       z.object({
         content: z
           .string()
-          .regex(new RegExp(/^[A-Za-z ]+$/), {
-            message: "Quotes can only contain letters.",
+          .regex(new RegExp(/^[A-Za-z '":;()]+$/), {
+            message: "Quotes can only contain letters and or ' ; : ( ) \" ",
           })
           .min(1, { message: "Must be 1 or more characters long." })
           .max(3000, { message: "Must be 3000 or fewer characters long." })
