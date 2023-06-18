@@ -16,9 +16,19 @@ const ProfilePage: NextPage<{ username: string }> = ({ username }) => {
         <meta name="description" content="An app for quotes" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <main className="flex h-screen justify-center">
-        <div>{data.username}</div>
-      </main>
+      <PageLayout>
+        <div className="relative h-48 bg-slate-600">
+          <Image
+            src={data.profilePicture}
+            alt={`${data.username ?? ""}'s profile picture`}
+            width={128}
+            height={128}
+            className="absolute bottom-0 left-0 -mb-[64px] ml-4 rounded-md border-2 border-black"
+          />
+          <div className="h-[64px]"></div>
+          <div>{data.username}</div>
+        </div>
+      </PageLayout>
     </>
   );
 };
@@ -26,6 +36,8 @@ const ProfilePage: NextPage<{ username: string }> = ({ username }) => {
 import { createServerSideHelpers } from "@trpc/react-query/server";
 import { appRouter } from "~/server/api/root";
 import { prisma } from "~/server/db";
+import { PageLayout } from "~/components/layout";
+import Image from "next/image";
 
 export const getStaticProps: GetStaticProps = async (context) => {
   const ssg = createServerSideHelpers({
