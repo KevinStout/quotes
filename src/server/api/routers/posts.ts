@@ -51,6 +51,16 @@ const ratelimit = new Ratelimit({
 });
 
 export const postsRouter = createTRPCRouter({
+  getPostById: publicProcedure
+    .input(z.object({ id: z.string() }))
+    .query(async ({ ctx, input }) => {
+      const post = await ctx.prisma.post.findUnique({
+        where: { id: input.id },
+      });
+      if (!post) throw new TRPCError({ code: "NOT_FOUND" });
+      return (await addUserDataToPosts([post]))[0];
+    }),
+
   getAll: publicProcedure.query(async ({ ctx }) => {
     const posts = await ctx.prisma.post.findMany({
       take: 100,
@@ -84,8 +94,9 @@ export const postsRouter = createTRPCRouter({
       z.object({
         content: z
           .string()
-          .regex(new RegExp(/^[A-Za-z '":;()]+$/), {
-            message: "Quotes can only contain letters and or ' ; : ( ) \" ",
+          .regex(new RegExp(/^[A-Za-z '":;().!?]+$/), {
+            message:
+              "Quotes can only contain letters and or these symblos ' ; : ( ) \" . ! ?",
           })
           .min(1, { message: "Must be 1 or more characters long." })
           .max(3000, { message: "Must be 3000 or fewer characters long." })

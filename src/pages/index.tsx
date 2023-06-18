@@ -1,7 +1,6 @@
 import { type NextPage } from "next";
-import Head from "next/head";
 import { api } from "~/utils/api";
-import { SignInButton, useUser } from "@clerk/nextjs";
+import { SignInButton, useUser, SignIn, SignOutButton } from "@clerk/nextjs";
 import Image from "next/image";
 import { LoadingPage, LoadingSpinner } from "~/components/loading";
 import { useState } from "react";
@@ -89,14 +88,8 @@ const Home: NextPage = () => {
 
   return (
     <>
-      <Head>
-        <title>Quotes</title>
-        <meta name="description" content="An app for quotes" />
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
       <PageLayout>
         <div className="flex border-b border-slate-400 p-4">
-          {" "}
           {!isSignedIn && (
             <div className="flex justify-center">
               <SignInButton />
