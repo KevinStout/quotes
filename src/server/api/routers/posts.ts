@@ -94,7 +94,7 @@ export const postsRouter = createTRPCRouter({
       z.object({
         content: z
           .string()
-          .regex(new RegExp(/^[A-Za-z '":;().!?]+$/), {
+          .regex(new RegExp(/^[A-Za-z '":;().!?/-/=]+$/), {
             message:
               "Quotes can only contain letters and or these symblos ' ; : ( ) \" . ! ? - =",
           })
