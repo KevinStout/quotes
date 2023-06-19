@@ -96,7 +96,7 @@ export const postsRouter = createTRPCRouter({
           .string()
           .regex(new RegExp(/^[A-Za-z '":;().!?]+$/), {
             message:
-              "Quotes can only contain letters and or these symblos ' ; : ( ) \" . ! ?",
+              "Quotes can only contain letters and or these symblos ' ; : ( ) \" . ! ? - =",
           })
           .min(1, { message: "Must be 1 or more characters long." })
           .max(3000, { message: "Must be 3000 or fewer characters long." })
