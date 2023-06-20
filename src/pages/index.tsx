@@ -39,7 +39,7 @@ const CreatePostWizard = () => {
       />
       <input
         type="text"
-        placeholder="Type a quote"
+        placeholder="Type a quote."
         className="grow bg-transparent outline-none"
         value={input}
         onChange={(e) => setInput(e.target.value)}
